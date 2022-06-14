@@ -3,13 +3,20 @@
     <div class="q-pa-md row items-start q-gutter-md">
       <q-card class="my-card q-pa-lg">
         <q-card-section>
-          <div class="text-h6 text-center">Iniciar Sesión</div>
+          <div class="text-h6 text-center">Registrarse</div>
           <!-- <div class="text-subtitle2">by John Doe</div> -->
         </q-card-section>
 
         <q-card-section class="q-pt-none">
           <div class="q-pa-md">
             <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+              <q-input
+                v-model="fullName"
+                filled
+                type="username"
+                hint="Nombre"
+                :rules="[(val) => !!val || 'Nombre es requerido']"
+              />
               <q-input
                 v-model="email"
                 filled
@@ -34,15 +41,15 @@
               </q-input>
               <div>
                 <q-btn
-                  class="full-width q-mt-xl q-mb-lg"
-                  label="Iniciar sesión"
+                  class="full-width q-mt-xl q-mt-lg"
+                  label="Registrarse"
                   type="submit"
                   color="primary"
                 />
               </div>
               <div class="text-center">
-                ¿No eres miembro?
-                <router-link to="/register">Registrate Ahora</router-link>
+                ¿Ya eres miembro?
+                <router-link to="/login">Inicia sesión</router-link>
               </div>
             </q-form>
           </div>
@@ -53,15 +60,16 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+const { defineComponent } = require("vue");
 import { useQuasar } from "quasar";
 import { ref } from "vue";
 
 export default defineComponent({
-  name: "LoginPage",
+  name: "RegisterPage",
+
   setup() {
     const $q = useQuasar();
-
+    const fullName = ref(null);
     const email = ref(null);
     const password = ref(null);
 
