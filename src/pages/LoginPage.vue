@@ -1,6 +1,17 @@
 <template>
   <div class="h-100">
-    <div>hello Login page works</div>
+    <div class="q-pa-md row items-start q-gutter-md">
+      <q-card class="my-card">
+        <q-card-section>
+          <div class="text-h6 text-center">Iniciar Sesión</div>
+          <!-- <div class="text-subtitle2">by John Doe</div> -->
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          {{ lorem }}
+        </q-card-section>
+      </q-card>
+    </div>
   </div>
 </template>
 
@@ -9,6 +20,12 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "LoginPage",
+  setup() {
+    return {
+      lorem:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    };
+  },
 });
 </script>
 
@@ -27,5 +44,10 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   padding: 15px;
+}
+
+.my-card {
+  width: 100%;
+  max-width: 600px;
 }
 </style>
