@@ -76,10 +76,12 @@ export default defineComponent({
       isPwd: ref(true),
 
       onSubmit(email, password) {
-        this.$store.dispatch(LOGIN, { email, password }).then((response) => {
-          console.log(response);
-        });
-        // .then(() => this.$router.push({ name: "home" }));
+        this.$store
+          .dispatch(LOGIN, { email, password })
+          .then(() => this.$router.push({ path: "/" }));
+        // .then((response) => {
+        //   console.log(response);
+        // });
 
         if (1 != 1) {
           $q.notify({
