@@ -9,7 +9,11 @@
 
         <q-card-section class="q-pt-none">
           <div class="q-pa-md">
-            <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+            <q-form
+              @submit="onSubmit(email, password)"
+              @reset="onReset"
+              class="q-gutter-md"
+            >
               <q-input
                 v-model="email"
                 filled
@@ -56,6 +60,7 @@
 import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
 import { ref } from "vue";
+import { LOGIN } from "../store/actions.type";
 
 export default defineComponent({
   name: "LoginPage",
@@ -70,20 +75,25 @@ export default defineComponent({
       password,
       isPwd: ref(true),
 
-      onSubmit() {
+      onSubmit(email, password) {
+        this.$store.dispatch(LOGIN, { email, password }).then((response) => {
+          console.log(response);
+        });
+        // .then(() => this.$router.push({ name: "home" }));
+
         if (1 != 1) {
           $q.notify({
             color: "red-5",
             textColor: "white",
             icon: "warning",
-            message: "You need to accept the license and terms first",
+            message: "No se pudo iniciar sesión",
           });
         } else {
           $q.notify({
             color: "green-4",
             textColor: "white",
             icon: "cloud_done",
-            message: "Submitted",
+            message: "Sesión Iniciada",
           });
         }
       },
