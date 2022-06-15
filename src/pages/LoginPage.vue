@@ -9,11 +9,7 @@
 
         <q-card-section class="q-pt-none">
           <div class="q-pa-md">
-            <q-form
-              @submit="onSubmit(email, password)"
-              @reset="onReset"
-              class="q-gutter-md"
-            >
+            <q-form @submit="onSubmit(email, password)" class="q-gutter-md">
               <q-input
                 v-model="email"
                 filled
@@ -50,6 +46,9 @@
               </div>
             </q-form>
           </div>
+          <div class="text-red-5" v-if="errors?.length > 0">
+            {{ errors }}
+          </div>
         </q-card-section>
       </q-card>
     </div>
@@ -59,9 +58,10 @@
 <script>
 import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
-// import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import { ref } from "vue";
 import { LOGIN } from "../store/actions.type";
+import { CLEAN_ERROR } from "src/store/mutations.type";
 
 export default defineComponent({
   name: "LoginPage",
@@ -86,24 +86,16 @@ export default defineComponent({
           });
           this.$router.push({ path: "/" });
         });
-
-        // if (1 != 1) {
-        //   $q.notify({
-        //     color: "red-5",
-        //     textColor: "white",
-        //     icon: "warning",
-        //     message: "No se pudo iniciar sesión",
-        //   });
-        // } else {
-        //   $q.notify({
-        //     color: "green-4",
-        //     textColor: "white",
-        //     icon: "cloud_done",
-        //     message: "Sesión Iniciada",
-        //   });
-        // }
       },
     };
+  },
+  computed: {
+    ...mapState({
+      errors: (state) => state.auth.errors,
+    }),
+  },
+  beforeMount() {
+    this.$store.commit(CLEAN_ERROR);
   },
 });
 </script>

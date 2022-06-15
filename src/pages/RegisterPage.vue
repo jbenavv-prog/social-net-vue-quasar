@@ -9,7 +9,10 @@
 
         <q-card-section class="q-pt-none">
           <div class="q-pa-md">
-            <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+            <q-form
+              @submit="onSubmit(email, password, fullName)"
+              class="q-gutter-md"
+            >
               <q-input
                 v-model="fullName"
                 filled
@@ -53,6 +56,9 @@
               </div>
             </q-form>
           </div>
+          <div class="text-red-5" v-if="errors?.length > 0">
+            {{ errors }}
+          </div>
         </q-card-section>
       </q-card>
     </div>
@@ -60,42 +66,52 @@
 </template>
 
 <script>
-const { defineComponent } = require("vue");
+import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
+import { mapState } from "vuex";
 import { ref } from "vue";
+import { REGISTER } from "../store/actions.type";
+import { CLEAN_ERROR } from "src/store/mutations.type";
 
 export default defineComponent({
   name: "RegisterPage",
 
   setup() {
     const $q = useQuasar();
+
     const fullName = ref(null);
     const email = ref(null);
     const password = ref(null);
 
     return {
+      fullName,
       email,
       password,
       isPwd: ref(true),
 
-      onSubmit() {
-        if (1 != 1) {
-          $q.notify({
-            color: "red-5",
-            textColor: "white",
-            icon: "warning",
-            message: "You need to accept the license and terms first",
+      onSubmit(email, password, fullName) {
+        this.$store
+          .dispatch(REGISTER, { email, password, fullName })
+          .then(() => {
+            $q.notify({
+              color: "green-4",
+              textColor: "white",
+              icon: "cloud_done",
+              message: "Cuenta creada",
+            });
+            this.$router.push({ path: "/login" });
           });
-        } else {
-          $q.notify({
-            color: "green-4",
-            textColor: "white",
-            icon: "cloud_done",
-            message: "Submitted",
-          });
-        }
       },
     };
+  },
+  computed: {
+    ...mapState({
+      errors: (state) => state.auth.errors,
+    }),
+  },
+
+  beforeMount() {
+    this.$store.commit(CLEAN_ERROR);
   },
 });
 </script>
