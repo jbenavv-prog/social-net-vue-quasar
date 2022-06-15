@@ -59,6 +59,7 @@
 <script>
 import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
+// import { mapState } from "vuex";
 import { ref } from "vue";
 import { LOGIN } from "../store/actions.type";
 
@@ -76,28 +77,31 @@ export default defineComponent({
       isPwd: ref(true),
 
       onSubmit(email, password) {
-        this.$store
-          .dispatch(LOGIN, { email, password })
-          .then(() => this.$router.push({ path: "/" }));
-        // .then((response) => {
-        //   console.log(response);
-        // });
-
-        if (1 != 1) {
-          $q.notify({
-            color: "red-5",
-            textColor: "white",
-            icon: "warning",
-            message: "No se pudo iniciar sesión",
-          });
-        } else {
+        this.$store.dispatch(LOGIN, { email, password }).then(() => {
           $q.notify({
             color: "green-4",
             textColor: "white",
             icon: "cloud_done",
             message: "Sesión Iniciada",
           });
-        }
+          this.$router.push({ path: "/" });
+        });
+
+        // if (1 != 1) {
+        //   $q.notify({
+        //     color: "red-5",
+        //     textColor: "white",
+        //     icon: "warning",
+        //     message: "No se pudo iniciar sesión",
+        //   });
+        // } else {
+        //   $q.notify({
+        //     color: "green-4",
+        //     textColor: "white",
+        //     icon: "cloud_done",
+        //     message: "Sesión Iniciada",
+        //   });
+        // }
       },
     };
   },

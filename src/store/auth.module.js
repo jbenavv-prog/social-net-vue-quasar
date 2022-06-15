@@ -1,10 +1,21 @@
+import ApiService from "../../common/apiService";
 import { LOGIN } from "./actions.type";
 
 const actions = {
   [LOGIN](context, credentials) {
-    console.log(context);
-    console.log(credentials);
-    return "login action";
+    return new Promise((resolve) => {
+      ApiService.post("auth/authenticate", credentials)
+        .then(({ data }) => {
+          if (data.ok) {
+            resolve(data);
+          } else {
+            console.log("into false error");
+          }
+        })
+        .catch((response) => {
+          console.log("Fallo del sistema");
+        });
+    });
   },
 };
 
