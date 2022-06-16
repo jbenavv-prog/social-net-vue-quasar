@@ -58,7 +58,7 @@
 <script>
 import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
-import { mapMutations, mapState } from "vuex";
+import { mapState } from "vuex";
 import { ref } from "vue";
 import { LOGIN } from "../store/actions.type";
 import { CLEAN_ERROR } from "src/store/mutations.type";

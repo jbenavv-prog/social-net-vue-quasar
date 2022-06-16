@@ -9,6 +9,16 @@ const state = {
   isAuthenticated: !!JwtService.getToken(),
 };
 
+const getters = {
+  currentUser(state) {
+    console.log(state);
+    return state.user;
+  },
+  isAuthenticated(state) {
+    return state.isAuthenticated;
+  },
+};
+
 const actions = {
   [LOGIN](context, credentials) {
     return new Promise((resolve) => {
@@ -62,4 +72,5 @@ export default {
   state,
   actions,
   mutations,
+  getters,
 };
