@@ -25,31 +25,42 @@
             </q-card-section>
             <img :src="item.imageURL" />
             <q-card-section>
-              <div>
-                <q-btn
-                  v-if="item.likes > 0"
-                  round
-                  color="primary"
-                  icon="thumb_up_off_alt"
-                  class="q-mb-sm"
-                >
-                  <q-badge rounded color="orange" floating>{{
-                    item.likes
-                  }}</q-badge>
-                </q-btn>
-                <div
-                  v-if="
-                    validateLike(item.idAccountsWhoLiked, item.idPublication)
-                  "
-                >
-                  Diste Like a esta publicación
+              <div class="row">
+                <div class="col">
+                  <q-btn
+                    v-if="item.likes > 0"
+                    round
+                    color="primary"
+                    icon="thumb_up_off_alt"
+                    class="q-mb-sm"
+                  >
+                    <q-badge rounded color="orange" floating>{{
+                      item.likes
+                    }}</q-badge>
+                  </q-btn>
+                  <div
+                    v-if="
+                      validateLike(item.idAccountsWhoLiked, item.idPublication)
+                    "
+                  >
+                    Diste Like a esta publicación
+                  </div>
+                </div>
+                <q-space />
+                <div class="col-3 q-mt-sm" v-if="item.comments">
+                  {{ item.comments.length }}
+                  <u class="u-comment" @click="commentsEnabled = true"
+                    >comentario(s)</u
+                  >
                 </div>
               </div>
             </q-card-section>
             <q-card-section class="flex justify-center">
               <q-btn
                 :id="item.idPublication"
-                flat
+                :flat="
+                  !validateLike(item.idAccountsWhoLiked, item.idPublication)
+                "
                 color="primary"
                 @click="like"
               >
@@ -61,7 +72,70 @@
                 color="primary"
                 icon="chat_bubble_outline"
                 label="Comentar"
+                @click="commentsEnabled = true"
               />
+            </q-card-section>
+            <q-card-section v-if="commentsEnabled">
+              <q-input
+                standout="bg-deep-purple text-white"
+                bottom-slots
+                v-model="text"
+                label="Escribe un comentario..."
+                counter
+                maxlength="100"
+                :dense="dense"
+                class="q-mb-sm"
+              >
+                <template v-slot:before>
+                  <q-avatar>
+                    <img :src="ownProfile.photoProfileURL || defaultAvatar" />
+                  </q-avatar>
+                </template>
+
+                <template v-slot:append>
+                  <q-icon
+                    v-if="text !== ''"
+                    name="close"
+                    @click="text = ''"
+                    class="cursor-pointer"
+                  />
+                </template>
+
+                <template v-slot:after>
+                  <q-btn round dense flat icon="send" />
+                </template>
+              </q-input>
+              <q-list
+                v-for="(comment, index) in item.comments"
+                :key="index"
+                bordered
+                class="rounded-borders"
+                style="max-width: 100%"
+              >
+                <q-item-label header>Comentarios</q-item-label>
+
+                <q-item clickable v-ripple>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="comment.photoProfileURL || defaultAvatar" />
+                    </q-avatar>
+                  </q-item-section>
+
+                  <q-item-section>
+                    <q-item-label caption lines="2">
+                      <span class="text-weight-bold">{{
+                        comment.fullName
+                      }}</span>
+                    </q-item-label>
+                    <q-item-label lines="1">{{
+                      comment.description
+                    }}</q-item-label>
+                  </q-item-section>
+
+                  <q-item-section side top> {{ comment.date }}</q-item-section>
+                </q-item>
+                <q-separator inset="item" />
+              </q-list>
             </q-card-section>
           </q-card>
         </div>
@@ -73,20 +147,31 @@
 <script>
 import { defineComponent } from "vue";
 import { mapState } from "vuex";
+import { ref } from "vue";
 import moment from "moment";
 import {
   FETCH_PUBLICATIONS,
   CHECK_AUTH,
   CREATE_REACTION,
+  CREATE_COMMENT,
 } from "../store/actions.type";
 
 export default defineComponent({
   name: "IndexPage",
 
+  data() {
+    return {
+      commentsEnabled: false,
+    };
+  },
+
   setup() {
     return {
       defaultAvatar: "/default-avatar.jpg",
       likes: {},
+      text: ref(""),
+      ph: ref(""),
+      dense: ref(false),
     };
   },
 
@@ -99,6 +184,7 @@ export default defineComponent({
     ...mapState({
       publications: (state) => state.publication.publications,
       user: (state) => state.auth.user,
+      ownProfile: (state) => state.profile.ownProfile,
     }),
   },
   methods: {
@@ -167,11 +253,16 @@ export default defineComponent({
         this.$store.dispatch(FETCH_PUBLICATIONS);
       });
     },
+    comment(event) {},
   },
 });
 </script>
 <style>
 .publication-container {
   width: 600px;
+}
+
+.u-comment {
+  cursor: pointer;
 }
 </style>

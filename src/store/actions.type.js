@@ -6,3 +6,4 @@ export const FETCH_PROFILE = "fetchProfile";
 export const FETCH_OWN_PROFILE = "fetchOwnProfile";
 export const FETCH_PUBLICATIONS = "fetchPublications";
 export const CREATE_REACTION = "createReaction";
+export const CREATE_COMMENT = "createComment";
