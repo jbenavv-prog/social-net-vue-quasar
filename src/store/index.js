@@ -3,6 +3,7 @@ import { createStore } from "vuex";
 
 import auth from "./auth.module";
 import profile from "./profile.module";
+import publication from "./publication.module";
 
 // import example from './module-example'
 
@@ -20,6 +21,7 @@ export default store(function (/* { ssrContext } */) {
     modules: {
       auth,
       profile,
+      publication,
     },
 
     // enable strict mode (adds overhead!)

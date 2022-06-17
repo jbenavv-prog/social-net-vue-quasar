@@ -29,6 +29,7 @@
 
 <script>
 import { defineComponent } from "vue";
+import { FETCH_PUBLICATIONS } from "../store/actions.type";
 
 export default defineComponent({
   name: "IndexPage",
@@ -37,6 +38,10 @@ export default defineComponent({
     return {
       defaultAvatar: "/default-avatar.jpg",
     };
+  },
+
+  beforeMount() {
+    this.$store.dispatch(FETCH_PUBLICATIONS);
   },
 });
 </script>

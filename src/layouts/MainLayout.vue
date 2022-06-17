@@ -50,7 +50,6 @@
 <script>
 import state from "src/store/module-example/state";
 import { defineComponent } from "vue";
-import { ref } from "vue";
 
 import { mapGetters, mapState } from "vuex";
 import { FETCH_OWN_PROFILE, LOGOUT } from "../store/actions.type";
