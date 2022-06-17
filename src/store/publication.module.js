@@ -12,12 +12,13 @@ const getters = {};
 
 const actions = {
   [FETCH_PUBLICATIONS](context) {
+    context.commit(SET_PUBLICATIONS, "hola");
     ApiService.setHeader();
-    return ApiService.post("publication/getPublications")
+    return ApiService.post("publication/getPublications", {})
       .then(({ data: response }) => {
         if (response.ok) {
-          console.log(response);
-          context.commit(SET_PUBLICATIONS, response.data);
+          console.log(response.data.result);
+          context.commit(SET_PUBLICATIONS, response.data.result);
         } else {
           console.log(response.message);
           context.commit(SET_ERROR, response.message);

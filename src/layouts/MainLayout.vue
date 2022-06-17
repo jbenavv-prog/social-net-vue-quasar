@@ -48,7 +48,6 @@
 </template>
 
 <script>
-import state from "src/store/module-example/state";
 import { defineComponent } from "vue";
 
 import { mapGetters, mapState } from "vuex";
@@ -69,7 +68,6 @@ export default defineComponent({
   },
 
   computed: {
-    ...mapGetters(["currentUser"]),
     ...mapState({
       errors: (state) => state.auth.errors,
       ownProfile: (state) => state.profile.ownProfile,

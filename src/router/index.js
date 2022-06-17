@@ -1,7 +1,4 @@
 import { route } from "quasar/wrappers";
-import { CHECK_AUTH } from "src/store/actions.type";
-import state from "src/store/module-example/state";
-import { CLEAN_ERROR } from "src/store/mutations.type";
 
 import {
   createRouter,
