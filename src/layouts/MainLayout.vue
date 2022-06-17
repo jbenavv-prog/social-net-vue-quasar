@@ -3,6 +3,8 @@
     <q-header elevated>
       <q-toolbar class="bg-primary text-white" style="height: 60px">
         <q-toolbar-title> Social Net VueJS </q-toolbar-title>
+        <q-btn flat round icon="home" />
+        <q-space />
         <q-btn round>
           <q-avatar size="45px">
             <img :src="ownProfile.photoProfileURL || defaultAvatar" />
@@ -59,8 +61,6 @@ export default defineComponent({
   setup() {
     return {
       defaultAvatar: "/default-avatar.jpg",
-      mobileData: ref(true),
-      bluetooth: ref(false),
     };
   },
   mounted() {},

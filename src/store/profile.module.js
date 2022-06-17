@@ -1,5 +1,9 @@
 import ApiService from "app/common/api.service";
-import { FETCH_PROFILE, FETCH_OWN_PROFILE } from "./actions.type";
+import {
+  FETCH_PROFILE,
+  FETCH_OWN_PROFILE,
+  FETCH_PUBLICATIONS,
+} from "./actions.type";
 import { SET_PROFILE, SET_OWN_PROFILE, SET_ERROR } from "./mutations.type";
 
 const state = {
