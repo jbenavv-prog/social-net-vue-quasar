@@ -79,12 +79,15 @@
               <q-input
                 standout="bg-deep-purple text-white"
                 bottom-slots
-                v-model="text"
+                v-model="text[item.idPublication]"
                 label="Escribe un comentario..."
                 counter
                 maxlength="100"
                 :dense="dense"
                 class="q-mb-sm"
+                @keyup.enter="
+                  comment(item.idPublication, text[item.idPublication])
+                "
               >
                 <template v-slot:before>
                   <q-avatar>
@@ -94,15 +97,25 @@
 
                 <template v-slot:append>
                   <q-icon
-                    v-if="text !== ''"
+                    v-if="text[item.idPublication] !== ''"
                     name="close"
-                    @click="text = ''"
+                    @click="text[item.idPublication] = ''"
                     class="cursor-pointer"
                   />
                 </template>
 
                 <template v-slot:after>
-                  <q-btn round dense flat icon="send" />
+                  <q-btn
+                    :id="item.idPublication"
+                    :value="text[item.idPublication]"
+                    round
+                    dense
+                    flat
+                    icon="send"
+                    @click="
+                      comment(item.idPublication, text[item.idPublication])
+                    "
+                  />
                 </template>
               </q-input>
               <q-list
@@ -120,7 +133,6 @@
                       <img :src="comment.photoProfileURL || defaultAvatar" />
                     </q-avatar>
                   </q-item-section>
-
                   <q-item-section>
                     <q-item-label caption lines="2">
                       <span class="text-weight-bold">{{
@@ -155,6 +167,7 @@ import {
   CREATE_REACTION,
   CREATE_COMMENT,
 } from "../store/actions.type";
+import { store } from "quasar/wrappers";
 
 export default defineComponent({
   name: "IndexPage",
@@ -169,9 +182,28 @@ export default defineComponent({
     return {
       defaultAvatar: "/default-avatar.jpg",
       likes: {},
-      text: ref(""),
+      text: ref([]),
       ph: ref(""),
       dense: ref(false),
+
+      comment(idPublication, description) {
+        if (description) {
+          const comment = {
+            idPublication,
+            description,
+          };
+
+          const request = {
+            user: this.user,
+            comment,
+          };
+
+          this.$store.dispatch(CREATE_COMMENT, request).then(() => {
+            this.$store.dispatch(FETCH_PUBLICATIONS);
+            this.text[idPublication] = "";
+          });
+        }
+      },
     };
   },
 
@@ -253,7 +285,6 @@ export default defineComponent({
         this.$store.dispatch(FETCH_PUBLICATIONS);
       });
     },
-    comment(event) {},
   },
 });
 </script>
