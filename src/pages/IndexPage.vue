@@ -24,22 +24,38 @@
               <div>{{ formatDate(item.date) }}</div>
             </q-card-section>
             <img :src="item.imageURL" />
-            <q-card-section v-if="item.likes > 0">
+            <q-card-section>
               <div>
-                <q-btn round color="primary" icon="thumb_up_off_alt">
+                <q-btn
+                  v-if="item.likes > 0"
+                  round
+                  color="primary"
+                  icon="thumb_up_off_alt"
+                  class="q-mb-sm"
+                >
                   <q-badge rounded color="orange" floating>{{
                     item.likes
                   }}</q-badge>
                 </q-btn>
+                <div
+                  v-if="
+                    validateLike(item.idAccountsWhoLiked, item.idPublication)
+                  "
+                >
+                  Diste Like a esta publicación
+                </div>
               </div>
             </q-card-section>
             <q-card-section class="flex justify-center">
               <q-btn
+                :id="item.idPublication"
                 flat
                 color="primary"
-                icon="thumb_up_off_alt"
-                label="Me gusta"
-              />
+                @click="like"
+              >
+                <q-icon :id="item.idPublication" name="thumb_up_off_alt" />
+                &nbsp; Me gusta
+              </q-btn>
               <q-btn
                 flat
                 color="primary"
@@ -58,7 +74,11 @@
 import { defineComponent } from "vue";
 import { mapState } from "vuex";
 import moment from "moment";
-import { FETCH_PUBLICATIONS } from "../store/actions.type";
+import {
+  FETCH_PUBLICATIONS,
+  CHECK_AUTH,
+  CREATE_REACTION,
+} from "../store/actions.type";
 
 export default defineComponent({
   name: "IndexPage",
@@ -66,27 +86,86 @@ export default defineComponent({
   setup() {
     return {
       defaultAvatar: "/default-avatar.jpg",
+      likes: {},
     };
   },
 
   beforeMount() {
     this.$store.dispatch(FETCH_PUBLICATIONS);
+    this.$store.dispatch(CHECK_AUTH);
   },
 
   computed: {
     ...mapState({
       publications: (state) => state.publication.publications,
+      user: (state) => state.auth.user,
     }),
   },
   methods: {
     formatDate(dateString) {
       dateString = moment(dateString).utc().format("YYYY-MM-DD");
-      return dateString;
-      // const date = new Date(dateString);
-      // // Then specify how you want your dates to be formatted
-      // return new Intl.DateTimeFormat("default", { dateStyle: "long" }).format(
-      //   date
-      // );
+    },
+
+    validateLike(idAccountsWhoLiked, idPublication) {
+      for (let i in idAccountsWhoLiked) {
+        if (idAccountsWhoLiked[i] == this.user.id) {
+          Object.assign(this.likes, {
+            [idPublication]: { like: 1, idTypeReaction: 1 },
+          });
+          return true;
+        }
+      }
+      Object.assign(this.likes, {
+        [idPublication]: { like: 0, idTypeReaction: 1 },
+      });
+      return false;
+    },
+
+    like(event) {
+      console.log(event);
+      let idPublication;
+
+      if (event.target.id) {
+        idPublication = event.target.id;
+      } else {
+        idPublication = event.target.parentElement.id;
+      }
+
+      let like;
+
+      if (this.likes[idPublication]) {
+        like = this.likes[idPublication].like;
+        if (this.likes[idPublication].like == 1) {
+          like = 0;
+        } else {
+          like = 1;
+        }
+      }
+
+      const idTypeReaction = 1;
+
+      Object.assign(this.likes, { [idPublication]: { like, idTypeReaction } });
+
+      const reaction = {
+        idPublication,
+        like,
+        idTypeReaction,
+      };
+
+      const request = {
+        user: this.user,
+        reaction,
+      };
+
+      // this.reactionService.create(request).subscribe(response => {
+      //   this.ngOnInit();
+      // })
+
+      console.log(request);
+
+      this.$store.dispatch(CREATE_REACTION, request).then(() => {
+        this.$store.dispatch(FETCH_PUBLICATIONS);
+      });
     },
   },
 });

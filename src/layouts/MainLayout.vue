@@ -10,7 +10,10 @@
             <img :src="ownProfile.photoProfileURL || defaultAvatar" />
           </q-avatar>
           <q-menu>
-            <div class="row no-wrap q-pa-xl">
+            <div
+              class="row no-wrap q-pa-xl justify-center"
+              style="width: 250px"
+            >
               <div class="column items-center">
                 <q-avatar size="72px">
                   <img :src="ownProfile.photoProfileURL || defaultAvatar" />

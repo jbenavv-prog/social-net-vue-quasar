@@ -1,4 +1,4 @@
-import { FETCH_PUBLICATIONS } from "./actions.type";
+import { FETCH_PUBLICATIONS, CREATE_REACTION } from "./actions.type";
 import { SET_PUBLICATIONS, SET_ERROR } from "./mutations.type";
 
 import ApiService from "app/common/api.service";
@@ -12,13 +12,29 @@ const getters = {};
 
 const actions = {
   [FETCH_PUBLICATIONS](context) {
-    context.commit(SET_PUBLICATIONS, "hola");
     ApiService.setHeader();
     return ApiService.post("publication/getPublications", {})
       .then(({ data: response }) => {
         if (response.ok) {
           console.log(response.data.result);
           context.commit(SET_PUBLICATIONS, response.data.result);
+        } else {
+          console.log(response.message);
+          context.commit(SET_ERROR, response.message);
+        }
+      })
+      .catch(() => {
+        console.log("Fallo del sistema");
+        context.commit(SET_ERROR, "Fallo del sistema");
+      });
+  },
+
+  [CREATE_REACTION](context, request) {
+    ApiService.setHeader();
+    return ApiService.post("publication/createReaction", request)
+      .then(({ data: response }) => {
+        if (response.ok) {
+          console.log(response.data);
         } else {
           console.log(response.message);
           context.commit(SET_ERROR, response.message);
