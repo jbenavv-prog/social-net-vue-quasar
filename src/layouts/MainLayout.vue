@@ -3,11 +3,40 @@
     <q-header elevated>
       <q-toolbar class="bg-primary text-white" style="height: 60px">
         <q-toolbar-title> Social Net VueJS </q-toolbar-title>
-        <q-avatar size="45px">
-          <img :src="defaultAvatar" />
-        </q-avatar>
-        {{ errors }}
-        {{ ownProfile }}
+        <q-btn round>
+          <q-avatar size="45px">
+            <img :src="ownProfile.photoProfileURL || defaultAvatar" />
+          </q-avatar>
+          <q-menu>
+            <div class="row no-wrap q-pa-xl">
+              <div class="column items-center">
+                <q-avatar size="72px">
+                  <img :src="ownProfile.photoProfileURL || defaultAvatar" />
+                </q-avatar>
+
+                <div class="text-subtitle1 q-mt-md q-mb-xs">
+                  {{ ownProfile.fullName }}
+                </div>
+                <q-btn
+                  class="q-mt-lg"
+                  color="primary"
+                  label="Ver perfil"
+                  push
+                  size="sm"
+                  v-close-popup
+                />
+                <q-btn
+                  class="q-mt-lg"
+                  label="Cerrar sesión"
+                  push
+                  size="sm"
+                  v-close-popup
+                  v-on:click="logout"
+                />
+              </div>
+            </div>
+          </q-menu>
+        </q-btn>
       </q-toolbar>
     </q-header>
     <q-page-container>
@@ -19,31 +48,24 @@
 <script>
 import state from "src/store/module-example/state";
 import { defineComponent } from "vue";
+import { ref } from "vue";
+
 import { mapGetters, mapState } from "vuex";
-import {
-  FETCH_PROFILE,
-  FETCH_OWN_PROFILE,
-  CHECK_AUTH,
-} from "../store/actions.type";
+import { FETCH_OWN_PROFILE, LOGOUT } from "../store/actions.type";
 
 export default defineComponent({
   name: "MainLayout",
 
-  components: {
-    // EssentialLink,
-  },
-
   setup() {
     return {
       defaultAvatar: "/default-avatar.jpg",
+      mobileData: ref(true),
+      bluetooth: ref(false),
     };
   },
-  mounted() {
-    console.log(this.errors);
-  },
+  mounted() {},
 
   beforeMount() {
-    // this.$store.dispatch(CHECK_AUTH);
     this.$store.dispatch(FETCH_OWN_PROFILE);
   },
 
@@ -55,6 +77,12 @@ export default defineComponent({
     }),
   },
 
-  getProfile() {},
+  methods: {
+    logout() {
+      this.$store
+        .dispatch(LOGOUT)
+        .then(() => this.$router.push({ path: "/login" }));
+    },
+  },
 });
 </script>

@@ -1,6 +1,6 @@
 import ApiService from "../../common/api.service";
 import JwtService from "../../common/jwt.service";
-import { LOGIN, REGISTER, CHECK_AUTH } from "./actions.type";
+import { LOGIN, LOGOUT, REGISTER, CHECK_AUTH } from "./actions.type";
 import { SET_AUTH, SET_ERROR, CLEAN_ERROR, PURGE_AUTH } from "./mutations.type";
 
 const state = {
@@ -35,6 +35,9 @@ const actions = {
           context.commit(SET_ERROR, "Fallo del sistema");
         });
     });
+  },
+  [LOGOUT](context) {
+    context.commit(PURGE_AUTH);
   },
   [REGISTER](context, credentials) {
     return new Promise((resolve) => {

@@ -89,13 +89,22 @@ export default defineComponent({
       },
     };
   },
+  beforeMount() {
+    this.$store.commit(CLEAN_ERROR);
+  },
+
   computed: {
     ...mapState({
       errors: (state) => state.auth.errors,
     }),
   },
-  beforeMount() {
-    this.$store.commit(CLEAN_ERROR);
+
+  methods: {
+    logout() {
+      this.$store.dispatch(LOGOUT).then(() => {
+        this.$router.push({ name: "home" });
+      });
+    },
   },
 });
 </script>
