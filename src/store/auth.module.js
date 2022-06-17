@@ -1,7 +1,7 @@
 import ApiService from "../../common/api.service";
 import JwtService from "../../common/jwt.service";
-import { LOGIN, REGISTER } from "./actions.type";
-import { SET_AUTH, SET_ERROR, CLEAN_ERROR } from "./mutations.type";
+import { LOGIN, REGISTER, CHECK_AUTH } from "./actions.type";
+import { SET_AUTH, SET_ERROR, CLEAN_ERROR, PURGE_AUTH } from "./mutations.type";
 
 const state = {
   errors: null,
@@ -51,6 +51,29 @@ const actions = {
         });
     });
   },
+  [CHECK_AUTH](context) {
+    return new Promise((resolve, reject) => {
+      if (JwtService.getToken()) {
+        ApiService.setHeader();
+        ApiService.post("auth/user", {})
+          .then(({ data: response }) => {
+            if (response.ok) {
+              resolve(response.data);
+              context.commit(SET_AUTH, response.data);
+            } else {
+              context.commit(SET_ERROR, response.message);
+            }
+          })
+          .catch((error) => {
+            // console.log("Fallo del sistema: ", error);
+            context.commit(SET_ERROR, "Fallo del sistema");
+            reject(error);
+          });
+      } else {
+        context.commit(PURGE_AUTH);
+      }
+    });
+  },
 };
 
 const mutations = {
@@ -65,6 +88,13 @@ const mutations = {
     state.user = user;
     state.errors = {};
     JwtService.saveToken(state.user.token);
+  },
+
+  [PURGE_AUTH](state) {
+    state.isAuthenticated = false;
+    state.user = {};
+    state.errors = {};
+    JwtService.destroyToken();
   },
 };
 
