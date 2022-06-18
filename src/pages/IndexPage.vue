@@ -5,29 +5,83 @@
         <div class="think-container">
           <q-card class="my-card">
             <q-card-section>
-              <q-field
-                rounded
-                outlined
-                bottom-slots
-                :label="`¿Que estás pensando, ${ownProfile.fullName}?`"
-                :dense="dense"
-              >
-                <template v-slot:before>
+              <div class="row">
+                <div class="col-2">
                   <q-avatar size="72px">
                     <img :src="ownProfile.photoProfileURL || defaultAvatar" />
                   </q-avatar>
-                </template>
-
-                <template v-slot:control>
-                  <div
-                    class="self-center full-width no-outline"
-                    tabindex="0"
-                  ></div>
-                </template>
-              </q-field>
+                </div>
+                <div class="col-10 items-center flex">
+                  <q-btn
+                    class="q-ml-xs"
+                    outline
+                    rounded
+                    color="primary"
+                    :label="`¿Que estás pensando, ${ownProfile.fullName}?`"
+                    @click="basic = true"
+                    style="width: 100%"
+                    no-caps
+                  />
+                </div>
+              </div>
             </q-card-section>
           </q-card>
         </div>
+        <q-dialog
+          v-model="basic"
+          transition-show="rotate"
+          transition-hide="rotate"
+        >
+          <q-card style="min-width: 450px">
+            <q-card-section class="row items-center q-pb-none">
+              <q-space />
+              <div class="text-h6">Crear Publicación</div>
+              <q-space />
+              <q-btn icon="close" flat round dense v-close-popup />
+            </q-card-section>
+            <q-separator class="q-mb-lg" />
+            <q-card-section class="row items-center">
+              <q-avatar size="50px" class="q-mr-sm">
+                <img :src="ownProfile.photoProfileURL || defaultAvatar" />
+              </q-avatar>
+              <div class="text-subtitle2">{{ ownProfile.fullName }}</div>
+            </q-card-section>
+            <q-card-section class="q-pt-none">
+              <q-input
+                dense
+                v-model="publicationText"
+                autofocus
+                @keyup.enter="prompt = false"
+                class="q-mt-lg"
+              />
+            </q-card-section>
+            <q-card-section v-if="prevImg">
+              <img :src="prevImg" />
+            </q-card-section>
+            <q-card-section>
+              <q-file
+                color="primary"
+                filled
+                label="Subir imagen"
+                accept="image/*"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="insert_photo" />
+                </template>
+              </q-file>
+            </q-card-section>
+            <q-card-actions>
+              <q-btn
+                label="Publicar"
+                color="primary"
+                style="width: 100%"
+                v-close-popup
+                class="q-ma-sm"
+                :disable="publicationText ? false : true"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
         <div
           v-for="(item, index) in publications"
           :key="index"
@@ -211,6 +265,14 @@ export default defineComponent({
       text: ref([]),
       ph: ref(""),
       dense: ref(false),
+      basic: ref(false),
+      fixed: ref(false),
+      alert: ref(false),
+      confirm: ref(false),
+      prompt: ref(false),
+      prevImg: "",
+
+      publicationText: ref(""),
 
       comment(idPublication, description) {
         if (description) {
@@ -300,10 +362,6 @@ export default defineComponent({
         user: this.user,
         reaction,
       };
-
-      // this.reactionService.create(request).subscribe(response => {
-      //   this.ngOnInit();
-      // })
 
       console.log(request);
 
