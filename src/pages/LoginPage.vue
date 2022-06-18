@@ -82,7 +82,7 @@ export default defineComponent({
             color: "green-4",
             textColor: "white",
             icon: "cloud_done",
-            message: "Sesión Iniciada",
+            message: "Sesión iniciada",
           });
           this.$router.push({ path: "/" });
         });

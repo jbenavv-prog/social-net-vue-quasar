@@ -2,6 +2,7 @@ import {
   FETCH_PUBLICATIONS,
   CREATE_REACTION,
   CREATE_COMMENT,
+  CREATE_PUBLICATION,
 } from "./actions.type";
 import { SET_PUBLICATIONS, SET_ERROR } from "./mutations.type";
 
@@ -52,6 +53,22 @@ const actions = {
   [CREATE_COMMENT](context, request) {
     ApiService.setHeader();
     return ApiService.post("publication/createComment", request)
+      .then(({ data: response }) => {
+        if (response.ok) {
+          console.log(response.data);
+        } else {
+          console.log(response.message);
+          context.commit(SET_ERROR, response.message);
+        }
+      })
+      .catch(() => {
+        console.log("Fallo del sistema");
+        context.commit(SET_ERROR, "Fallo del sistema");
+      });
+  },
+  [CREATE_PUBLICATION](context, formData) {
+    ApiService.setHeader();
+    return ApiService.post("publication/create", formData)
       .then(({ data: response }) => {
         if (response.ok) {
           console.log(response.data);

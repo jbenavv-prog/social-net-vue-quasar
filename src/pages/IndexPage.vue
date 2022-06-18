@@ -55,15 +55,17 @@
                 class="q-mt-lg"
               />
             </q-card-section>
-            <q-card-section v-if="prevImg">
-              <img :src="prevImg" />
+            <q-card-section v-if="url" class="flex justify-center">
+              <img :src="url" style="width: 300px" />
             </q-card-section>
             <q-card-section>
               <q-file
+                id="filePicker"
                 color="primary"
                 filled
-                label="Subir imagen"
                 accept="image/*"
+                v-model="fileUploaded"
+                :displayValue="false"
               >
                 <template v-slot:prepend>
                   <q-icon name="insert_photo" />
@@ -77,7 +79,8 @@
                 style="width: 100%"
                 v-close-popup
                 class="q-ma-sm"
-                :disable="publicationText ? false : true"
+                :disable="publicationText && url ? false : true"
+                @click="createPublication()"
               />
             </q-card-actions>
           </q-card>
@@ -240,12 +243,14 @@
 import { defineComponent } from "vue";
 import { mapState } from "vuex";
 import { ref } from "vue";
+import { useQuasar } from "quasar";
 import moment from "moment";
 import {
   FETCH_PUBLICATIONS,
   CHECK_AUTH,
   CREATE_REACTION,
   CREATE_COMMENT,
+  CREATE_PUBLICATION,
 } from "../store/actions.type";
 import { store } from "quasar/wrappers";
 
@@ -255,10 +260,13 @@ export default defineComponent({
   data() {
     return {
       commentsEnabled: false,
+      url: null,
+      imgFile: null,
     };
   },
 
   setup() {
+    const $q = useQuasar();
     return {
       defaultAvatar: "/default-avatar.jpg",
       likes: {},
@@ -270,8 +278,7 @@ export default defineComponent({
       alert: ref(false),
       confirm: ref(false),
       prompt: ref(false),
-      prevImg: "",
-
+      fileUploaded: ref(null),
       publicationText: ref(""),
 
       comment(idPublication, description) {
@@ -307,7 +314,34 @@ export default defineComponent({
       ownProfile: (state) => state.profile.ownProfile,
     }),
   },
+  watch: {
+    fileUploaded: function (file) {
+      this.url = URL.createObjectURL(file);
+      this.imgFile = file;
+    },
+  },
   methods: {
+    createPublication() {
+      const formData = new FormData();
+      formData.append("file", this.imgFile);
+      formData.append("user", JSON.stringify(this.user));
+      formData.append("idTypePublication", 1);
+      formData.append("description", this.publicationText);
+
+      console.log(this.$refs.fileupload);
+      this.$store.dispatch(CREATE_PUBLICATION, formData).then(() => {
+        this.$q.notify({
+          color: "green-4",
+          textColor: "white",
+          icon: "cloud_done",
+          message: "Publicación creada",
+        });
+        this.$store.dispatch(FETCH_PUBLICATIONS);
+        this.url = null;
+        this.publicationText = ref("");
+      });
+    },
+
     formatDate(dateString) {
       dateString = moment(dateString).utc().format("YYYY-MM-DD");
     },
@@ -362,8 +396,6 @@ export default defineComponent({
         user: this.user,
         reaction,
       };
-
-      console.log(request);
 
       this.$store.dispatch(CREATE_REACTION, request).then(() => {
         this.$store.dispatch(FETCH_PUBLICATIONS);
