@@ -2,6 +2,32 @@
   <q-page class="flex justify-center">
     <div class="q-pa-md justify-center" style="width: 700px">
       <div class="row q-gutter-sm">
+        <div class="think-container">
+          <q-card class="my-card">
+            <q-card-section>
+              <q-field
+                rounded
+                outlined
+                bottom-slots
+                :label="`¿Que estás pensando, ${ownProfile.fullName}?`"
+                :dense="dense"
+              >
+                <template v-slot:before>
+                  <q-avatar size="72px">
+                    <img :src="ownProfile.photoProfileURL || defaultAvatar" />
+                  </q-avatar>
+                </template>
+
+                <template v-slot:control>
+                  <div
+                    class="self-center full-width no-outline"
+                    tabindex="0"
+                  ></div>
+                </template>
+              </q-field>
+            </q-card-section>
+          </q-card>
+        </div>
         <div
           v-for="(item, index) in publications"
           :key="index"
@@ -290,6 +316,10 @@ export default defineComponent({
 </script>
 <style>
 .publication-container {
+  width: 600px;
+}
+
+.think-container {
   width: 600px;
 }
 
