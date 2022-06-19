@@ -7,7 +7,10 @@
             <q-card-section>
               <div class="row">
                 <div class="col-2">
-                  <q-avatar size="72px">
+                  <q-avatar
+                    size="72px"
+                    @click="$router.push({ path: `/profile/${user.id}` })"
+                  >
                     <img :src="ownProfile.photoProfileURL || defaultAvatar" />
                   </q-avatar>
                 </div>
@@ -41,7 +44,11 @@
             </q-card-section>
             <q-separator class="q-mb-lg" />
             <q-card-section class="row items-center">
-              <q-avatar size="50px" class="q-mr-sm">
+              <q-avatar
+                size="50px"
+                class="q-mr-sm"
+                @click="$router.push({ path: `/profile/${user.id}` })"
+              >
                 <img :src="ownProfile.photoProfileURL || defaultAvatar" />
               </q-avatar>
               <div class="text-subtitle2">{{ ownProfile.fullName }}</div>
@@ -173,7 +180,10 @@
                 "
               >
                 <template v-slot:before>
-                  <q-avatar>
+                  <q-avatar
+                    size="50px"
+                    @click="$router.push({ path: `/profile/${user.id}` })"
+                  >
                     <img :src="ownProfile.photoProfileURL || defaultAvatar" />
                   </q-avatar>
                 </template>
@@ -328,7 +338,6 @@ export default defineComponent({
       formData.append("idTypePublication", 1);
       formData.append("description", this.publicationText);
 
-      console.log(this.$refs.fileupload);
       this.$store.dispatch(CREATE_PUBLICATION, formData).then(() => {
         this.$q.notify({
           color: "green-4",
@@ -362,7 +371,6 @@ export default defineComponent({
     },
 
     like(event) {
-      console.log(event);
       let idPublication;
 
       if (event.target.id) {

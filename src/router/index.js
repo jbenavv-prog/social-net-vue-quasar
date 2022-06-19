@@ -43,7 +43,6 @@ export default route(function ({ store } /* { store, ssrContext } */) {
       to.path !== "/register" &&
       !store.getters["isAuthenticated"]
     ) {
-      console.log(store.getters["isAuthenticated"]);
       return { path: "/login" };
     }
   });

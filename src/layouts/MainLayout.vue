@@ -3,7 +3,7 @@
     <q-header elevated>
       <q-toolbar class="bg-primary text-white" style="height: 60px">
         <q-toolbar-title> Social Net VueJS </q-toolbar-title>
-        <q-btn flat round icon="home" />
+        <q-btn flat round icon="home" @click="$router.push({ path: '/' })" />
         <q-space />
         <q-btn round>
           <q-avatar size="45px">
@@ -29,6 +29,7 @@
                   push
                   size="sm"
                   v-close-popup
+                  @click="$router.push({ path: `/profile/${user.id}` })"
                 />
                 <q-btn
                   class="q-mt-lg"
@@ -72,6 +73,7 @@ export default defineComponent({
 
   computed: {
     ...mapState({
+      user: (state) => state.auth.user,
       errors: (state) => state.auth.errors,
       ownProfile: (state) => state.profile.ownProfile,
     }),
