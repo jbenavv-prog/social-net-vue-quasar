@@ -26,7 +26,7 @@
             label-class="bg-grey-3 text-grey-8"
             external-label
             color="primary"
-            @click="onClick"
+            @click="basicPhotoProfile = true"
             icon="insert_photo"
             label="Subir foto de perfil"
           />
@@ -40,6 +40,59 @@
           />
         </q-fab>
       </div>
+      <q-dialog
+        v-model="basicPhotoProfile"
+        transition-show="rotate"
+        transition-hide="rotate"
+      >
+        <q-card style="min-width: 450px">
+          <q-card-section class="row items-center q-pb-none">
+            <q-space />
+            <div class="text-h6">Actualizar foto de perfil</div>
+            <q-space />
+            <q-btn icon="close" flat round dense v-close-popup />
+          </q-card-section>
+          <q-separator class="q-mb-lg" />
+          <q-card-section class="row items-center">
+            <q-avatar
+              size="50px"
+              class="q-mr-sm"
+              @click="$router.push({ path: `/profile/${user.id}` })"
+            >
+              <img :src="profile.photoProfileURL || defaultAvatar" />
+            </q-avatar>
+            <div class="text-subtitle2">{{ profile.fullName }}</div>
+          </q-card-section>
+          <q-card-section v-if="photoProfileUrl" class="flex justify-center">
+            <img :src="photoProfileUrl" style="width: 300px" />
+          </q-card-section>
+          <q-card-section>
+            <q-file
+              id="filePicker"
+              color="primary"
+              filled
+              accept="image/*"
+              v-model="photoProfileUploaded"
+              displayValue=""
+            >
+              <template v-slot:prepend>
+                <q-icon name="insert_photo" />
+              </template>
+            </q-file>
+          </q-card-section>
+          <q-card-actions>
+            <q-btn
+              label="Actualizar"
+              color="primary"
+              style="width: 100%"
+              v-close-popup
+              class="q-ma-sm"
+              :disable="photoProfileUrl ? false : true"
+              @click="updatePhotoProfile()"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
     <div class="q-pa-md">
       <div class="row items-start q-gutter-md justify-center">
@@ -334,6 +387,7 @@ import {
   CHECK_AUTH,
   FETCH_PROFILE,
   FETCH_PROFILE_PUBLICATIONS,
+  UPDATE_PHOTO_PROFILE,
   CREATE_PUBLICATION,
   CREATE_COMMENT,
   CREATE_REACTION,
@@ -347,6 +401,8 @@ export default defineComponent({
       commentsEnabled: false,
       url: null,
       imgFile: null,
+      photoProfileUrl: null,
+      photoProfileimgFile: null,
     };
   },
 
@@ -355,11 +411,13 @@ export default defineComponent({
     return {
       defaultAvatar: "/default-avatar.jpg",
       basic: ref(false),
+      basicPhotoProfile: ref(false),
       likes: {},
       text: ref([]),
       dense: ref(false),
       prompt: ref(false),
       fileUploaded: ref(null),
+      photoProfileUploaded: ref(null),
       publicationText: ref(""),
       fab2: ref(false),
 
@@ -438,6 +496,33 @@ export default defineComponent({
       });
     },
 
+    updatePhotoProfile() {
+      console.log("update photo profile click");
+      const formData = new FormData();
+      formData.append("file", this.photoProfileimgFile);
+      formData.append("user", JSON.stringify(this.user));
+      formData.append("idTypePublication", 2);
+
+      this.$store.dispatch(UPDATE_PHOTO_PROFILE, formData).then(() => {
+        this.$q.notify({
+          color: "green-4",
+          textColor: "white",
+          icon: "cloud_done",
+          message: "Foto de perfil actualizada",
+        });
+
+        const user = {
+          id: this.$route.params.id,
+        };
+        // this.$store.dispatch(FETCH_PROFILE_PUBLICATIONS, user);
+        // this.$store.dispatch(FETCH_PROFILE, user);
+        // this.photoProfileUrl = null;
+        window.location.reload();
+      });
+    },
+
+    updateProfileDetails() {},
+
     validateLike(idAccountsWhoLiked, idPublication) {
       for (let i in idAccountsWhoLiked) {
         if (idAccountsWhoLiked[i] == this.user.id) {
@@ -502,6 +587,10 @@ export default defineComponent({
     fileUploaded: function (file) {
       this.url = URL.createObjectURL(file);
       this.imgFile = file;
+    },
+    photoProfileUploaded: function (file) {
+      this.photoProfileUrl = URL.createObjectURL(file);
+      this.photoProfileimgFile = file;
     },
   },
 });

@@ -38,7 +38,7 @@
           <q-card style="min-width: 450px">
             <q-card-section class="row items-center q-pb-none">
               <q-space />
-              <div class="text-h6">Crear Publicación</div>
+              <div class="text-h6">Crear publicación</div>
               <q-space />
               <q-btn icon="close" flat round dense v-close-popup />
             </q-card-section>

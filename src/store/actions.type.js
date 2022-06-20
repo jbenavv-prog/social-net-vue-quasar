@@ -4,6 +4,7 @@ export const REGISTER = "register";
 export const CHECK_AUTH = "checkAuth";
 export const FETCH_PROFILE = "fetchProfile";
 export const FETCH_OWN_PROFILE = "fetchOwnProfile";
+export const UPDATE_PHOTO_PROFILE = "updatePhotoProfile";
 export const FETCH_PUBLICATIONS = "fetchPublications";
 export const FETCH_PROFILE_PUBLICATIONS = "fetchProfilePublications";
 export const CREATE_REACTION = "createReaction";

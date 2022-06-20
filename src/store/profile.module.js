@@ -1,5 +1,9 @@
 import ApiService from "app/common/api.service";
-import { FETCH_PROFILE, FETCH_OWN_PROFILE } from "./actions.type";
+import {
+  FETCH_PROFILE,
+  FETCH_OWN_PROFILE,
+  UPDATE_PHOTO_PROFILE,
+} from "./actions.type";
 import { SET_PROFILE, SET_OWN_PROFILE, SET_ERROR } from "./mutations.type";
 
 const state = {
@@ -34,6 +38,21 @@ const actions = {
   [FETCH_OWN_PROFILE](context) {
     ApiService.setHeader();
     return ApiService.post("profiles/getOwnProfile", {})
+      .then(({ data: response }) => {
+        if (response.ok) {
+          context.commit(SET_OWN_PROFILE, response.data);
+        } else {
+          context.commit(SET_ERROR, response.message);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
+
+  [UPDATE_PHOTO_PROFILE](context, formData) {
+    ApiService.setHeader();
+    return ApiService.post("profiles/updatePhotoProfile", formData)
       .then(({ data: response }) => {
         if (response.ok) {
           context.commit(SET_OWN_PROFILE, response.data);
