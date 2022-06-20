@@ -34,7 +34,7 @@
             label-class="bg-grey-3 text-grey-8"
             external-label
             color="secondary"
-            @click="onClick"
+            @click="basicDetails = true"
             icon="text_snippet"
             label="Editar detalles"
           />
@@ -93,6 +93,71 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
+      <q-dialog
+        v-model="basicDetails"
+        transition-show="rotate"
+        transition-hide="rotate"
+      >
+        <q-card style="min-width: 450px">
+          <q-card-section class="row items-center q-pb-none">
+            <q-space />
+            <div class="text-h6">Editar detalles</div>
+            <q-space />
+            <q-btn icon="close" flat round dense v-close-popup />
+          </q-card-section>
+          <q-separator class="q-mb-lg" />
+          <q-card-section class="row items-center">
+            <q-avatar
+              size="50px"
+              class="q-mr-sm"
+              @click="$router.push({ path: `/profile/${user.id}` })"
+            >
+              <img :src="profile.photoProfileURL || defaultAvatar" />
+            </q-avatar>
+            <div class="text-subtitle2">{{ profile.fullName }}</div>
+          </q-card-section>
+          <q-card-section class="flex justify-center">
+            <q-form
+              id="details"
+              style="width: 100%"
+              @submit="updateProfileDetails(phone, location, college)"
+              class="q-pa-md"
+            >
+              <q-input
+                v-model="phone"
+                label="Teléfono"
+                filled
+                type="text"
+                class="q-mt-md"
+              />
+              <q-input
+                v-model="location"
+                label="Ubicación"
+                filled
+                type="text"
+                class="q-mt-md"
+              />
+              <q-input
+                v-model="college"
+                label="Colegio"
+                filled
+                type="text"
+                class="q-mt-md"
+              />
+            </q-form>
+          </q-card-section>
+          <q-card-actions class="q-ma-md">
+            <q-btn
+              class="full-width"
+              label="Actualizar"
+              type="submit"
+              form="details"
+              color="primary"
+              v-close-popup
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
     <div class="q-pa-md">
       <div class="row items-start q-gutter-md justify-center">
@@ -103,19 +168,19 @@
             </q-card-section>
             <q-card-section>
               <div class="text-subtitle1">Teléfono</div>
-              <div class="text-subtitle2">
+              <div class="text-subtitle2" v-if="profile.phone !== 'null'">
                 {{ profile.phone }}
               </div>
             </q-card-section>
             <q-card-section>
               <div class="text-subtitle1">Ubicación</div>
-              <div class="text-subtitle2">
+              <div class="text-subtitle2" v-if="profile.location !== 'null'">
                 {{ profile.location }}
               </div>
             </q-card-section>
             <q-card-section>
               <div class="text-subtitle1">Colegio</div>
-              <div class="text-subtitle2">
+              <div class="text-subtitle2" v-if="profile.college !== 'null'">
                 {{ profile.college }}
               </div>
             </q-card-section>
@@ -391,6 +456,7 @@ import {
   CREATE_PUBLICATION,
   CREATE_COMMENT,
   CREATE_REACTION,
+  UPDATE_PROFILE_DETAILS,
 } from "src/store/actions.type";
 
 export default defineComponent({
@@ -408,10 +474,16 @@ export default defineComponent({
 
   setup() {
     const $q = useQuasar();
+
+    const phone = ref(null);
+    const location = ref(null);
+    const college = ref(null);
+
     return {
       defaultAvatar: "/default-avatar.jpg",
       basic: ref(false),
       basicPhotoProfile: ref(false),
+      basicDetails: ref(false),
       likes: {},
       text: ref([]),
       dense: ref(false),
@@ -420,9 +492,35 @@ export default defineComponent({
       photoProfileUploaded: ref(null),
       publicationText: ref(""),
       fab2: ref(false),
+      phone,
+      location,
+      college,
 
-      onClick() {
-        // console.log('Clicked on a fab action')
+      updateProfileDetails(phone, location, college) {
+        const user = {
+          id: this.$route.params.id,
+        };
+
+        const formData = {
+          phone,
+          location,
+          college,
+        };
+
+        const request = {
+          formData,
+          user,
+        };
+
+        this.$store.dispatch(UPDATE_PROFILE_DETAILS, request).then(() => {
+          $q.notify({
+            color: "green-4",
+            textColor: "white",
+            icon: "cloud_done",
+            message: "Detalles actualizados",
+          });
+          this.$store.dispatch(FETCH_PROFILE, user);
+        });
       },
 
       comment(idPublication, description) {
@@ -462,7 +560,10 @@ export default defineComponent({
   computed: {
     ...mapState({
       user: (state) => state.auth.user,
-      profile: (state) => state.profile.profile,
+      profile: (state) => {
+        // phone = state.profile.profile.phone;
+        return state.profile.profile;
+      },
       profilePublications: (state) => state.publication.profilePublications,
     }),
   },
@@ -497,7 +598,6 @@ export default defineComponent({
     },
 
     updatePhotoProfile() {
-      console.log("update photo profile click");
       const formData = new FormData();
       formData.append("file", this.photoProfileimgFile);
       formData.append("user", JSON.stringify(this.user));
@@ -510,18 +610,9 @@ export default defineComponent({
           icon: "cloud_done",
           message: "Foto de perfil actualizada",
         });
-
-        const user = {
-          id: this.$route.params.id,
-        };
-        // this.$store.dispatch(FETCH_PROFILE_PUBLICATIONS, user);
-        // this.$store.dispatch(FETCH_PROFILE, user);
-        // this.photoProfileUrl = null;
         window.location.reload();
       });
     },
-
-    updateProfileDetails() {},
 
     validateLike(idAccountsWhoLiked, idPublication) {
       for (let i in idAccountsWhoLiked) {

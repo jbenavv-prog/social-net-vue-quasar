@@ -3,6 +3,7 @@ import {
   FETCH_PROFILE,
   FETCH_OWN_PROFILE,
   UPDATE_PHOTO_PROFILE,
+  UPDATE_PROFILE_DETAILS,
 } from "./actions.type";
 import { SET_PROFILE, SET_OWN_PROFILE, SET_ERROR } from "./mutations.type";
 
@@ -55,7 +56,21 @@ const actions = {
     return ApiService.post("profiles/updatePhotoProfile", formData)
       .then(({ data: response }) => {
         if (response.ok) {
-          context.commit(SET_OWN_PROFILE, response.data);
+          // context.commit(SET_OWN_PROFILE, response.data);
+        } else {
+          context.commit(SET_ERROR, response.message);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
+
+  [UPDATE_PROFILE_DETAILS](context, request) {
+    ApiService.setHeader();
+    return ApiService.post("profiles/updateDetails", request)
+      .then(({ data: response }) => {
+        if (response.ok) {
         } else {
           context.commit(SET_ERROR, response.message);
         }
