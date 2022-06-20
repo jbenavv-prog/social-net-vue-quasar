@@ -100,7 +100,10 @@
           <q-card class="q-ma-sm">
             <q-card-section>
               <q-btn round>
-                <q-avatar size="45px">
+                <q-avatar
+                  size="45px"
+                  @click="$router.push({ path: `/profile/${item.idAccount}` })"
+                >
                   <img :src="item.photoProfileURL || defaultAvatar" />
                 </q-avatar>
               </q-btn>
@@ -222,7 +225,11 @@
 
                 <q-item clickable v-ripple>
                   <q-item-section avatar>
-                    <q-avatar>
+                    <q-avatar
+                      @click="
+                        $router.push({ path: `/profile/${comment.idAccount}` })
+                      "
+                    >
                       <img :src="comment.photoProfileURL || defaultAvatar" />
                     </q-avatar>
                   </q-item-section>
@@ -353,6 +360,7 @@ export default defineComponent({
 
     formatDate(dateString) {
       dateString = moment(dateString).utc().format("YYYY-MM-DD");
+      return dateString;
     },
 
     validateLike(idAccountsWhoLiked, idPublication) {

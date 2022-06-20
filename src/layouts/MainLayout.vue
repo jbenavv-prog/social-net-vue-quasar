@@ -54,7 +54,7 @@
 <script>
 import { defineComponent } from "vue";
 
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
 import { FETCH_OWN_PROFILE, LOGOUT } from "../store/actions.type";
 
 export default defineComponent({

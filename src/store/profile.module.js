@@ -15,19 +15,19 @@ const getters = {
 };
 
 const actions = {
-  [FETCH_PROFILE](context, payload) {
-    console.log(payload);
-    const { user } = payload;
-    return ApiService.get("profiles/getProfile", user)
+  [FETCH_PROFILE](context, user) {
+    ApiService.setHeader();
+    return ApiService.post("profiles/getProfile", user)
       .then(({ data: response }) => {
         if (response.ok) {
+          console.log(response.data);
           context.commit(SET_PROFILE, response.data);
         } else {
           context.commit(SET_ERROR, response.message);
         }
       })
       .catch((error) => {
-        // context.commit(SET_ERROR, error);
+        console.log(error);
       });
   },
 

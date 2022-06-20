@@ -5,3 +5,4 @@ export const CLEAN_ERROR = "cleanError";
 export const SET_PROFILE = "setProfile";
 export const SET_OWN_PROFILE = "setOwnProfile";
 export const SET_PUBLICATIONS = "setPublications";
+export const SET_PROFILE_PUBLICATIONS = "setProfilePublications";
