@@ -10,35 +10,157 @@
         </q-avatar>
         <h1 class="text-white">{{ profile.fullName }}</h1>
       </q-parallax>
+      <div class="q-mt-md q-ml-md">
+        <q-fab
+          v-if="user.id == profile.idAccount"
+          v-model="fab2"
+          label="Editar"
+          external-label
+          label-class="bg-grey-3 text-purple"
+          vertical-actions-align="left"
+          color="purple"
+          icon="keyboard_arrow_down"
+          direction="down"
+        >
+          <q-fab-action
+            label-class="bg-grey-3 text-grey-8"
+            external-label
+            color="primary"
+            @click="onClick"
+            icon="insert_photo"
+            label="Subir foto de perfil"
+          />
+          <q-fab-action
+            label-class="bg-grey-3 text-grey-8"
+            external-label
+            color="secondary"
+            @click="onClick"
+            icon="text_snippet"
+            label="Editar detalles"
+          />
+        </q-fab>
+      </div>
     </div>
     <div class="q-pa-md">
       <div class="row items-start q-gutter-md justify-center">
         <q-responsive :ratio="1 / 5" class="col-3">
-          <q-card class="column">
+          <q-card class="column q-mb-lg">
             <q-card-section>
               <div class="text-h6">Detalles</div>
             </q-card-section>
             <q-card-section>
               <div class="text-subtitle1">Teléfono</div>
               <div class="text-subtitle2">
-                {{ profile.phone }} example phone
+                {{ profile.phone }}
               </div>
             </q-card-section>
             <q-card-section>
               <div class="text-subtitle1">Ubicación</div>
               <div class="text-subtitle2">
-                {{ profile.location }} example ubicación
+                {{ profile.location }}
               </div>
             </q-card-section>
             <q-card-section>
               <div class="text-subtitle1">Colegio</div>
               <div class="text-subtitle2">
-                {{ profile.college }} example Colegio
+                {{ profile.college }}
               </div>
             </q-card-section>
           </q-card>
         </q-responsive>
-        <q-responsive :ratio="1 / 3.5" class="col-5">
+        <q-responsive :ratio="1 / 4" class="col-5">
+          <q-card
+            v-if="user.id == profile.idAccount"
+            class="column q-mb-lg"
+            style="height: 100px !important"
+          >
+            <q-card-section>
+              <div class="row">
+                <div class="col-2">
+                  <q-avatar
+                    size="72px"
+                    @click="$router.push({ path: `/profile/${user.id}` })"
+                  >
+                    <img :src="profile.photoProfileURL || defaultAvatar" />
+                  </q-avatar>
+                </div>
+                <div class="col-10 items-center flex">
+                  <q-btn
+                    class="q-ml-xs"
+                    outline
+                    rounded
+                    color="primary"
+                    :label="`¿Que estás pensando, ${profile.fullName}?`"
+                    @click="basic = true"
+                    style="width: 100%"
+                    no-caps
+                  />
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+          <q-dialog
+            v-model="basic"
+            transition-show="rotate"
+            transition-hide="rotate"
+          >
+            <q-card style="min-width: 450px">
+              <q-card-section class="row items-center q-pb-none">
+                <q-space />
+                <div class="text-h6">Crear Publicación</div>
+                <q-space />
+                <q-btn icon="close" flat round dense v-close-popup />
+              </q-card-section>
+              <q-separator class="q-mb-lg" />
+              <q-card-section class="row items-center">
+                <q-avatar
+                  size="50px"
+                  class="q-mr-sm"
+                  @click="$router.push({ path: `/profile/${user.id}` })"
+                >
+                  <img :src="profile.photoProfileURL || defaultAvatar" />
+                </q-avatar>
+                <div class="text-subtitle2">{{ profile.fullName }}</div>
+              </q-card-section>
+              <q-card-section class="q-pt-none">
+                <q-input
+                  dense
+                  v-model="publicationText"
+                  autofocus
+                  @keyup.enter="prompt = false"
+                  class="q-mt-lg"
+                />
+              </q-card-section>
+              <q-card-section v-if="url" class="flex justify-center">
+                <img :src="url" style="width: 300px" />
+              </q-card-section>
+              <q-card-section>
+                <q-file
+                  id="filePicker"
+                  color="primary"
+                  filled
+                  accept="image/*"
+                  v-model="fileUploaded"
+                  displayValue=""
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="insert_photo" />
+                  </template>
+                </q-file>
+              </q-card-section>
+              <q-card-actions>
+                <q-btn
+                  label="Publicar"
+                  color="primary"
+                  style="width: 100%"
+                  v-close-popup
+                  class="q-ma-sm"
+                  :disable="publicationText && url ? false : true"
+                  @click="createPublication()"
+                />
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
           <q-card
             class="column q-mb-lg"
             v-for="(item, index) in profilePublications"
@@ -223,6 +345,8 @@ export default defineComponent({
   data() {
     return {
       commentsEnabled: false,
+      url: null,
+      imgFile: null,
     };
   },
 
@@ -230,9 +354,18 @@ export default defineComponent({
     const $q = useQuasar();
     return {
       defaultAvatar: "/default-avatar.jpg",
+      basic: ref(false),
       likes: {},
       text: ref([]),
       dense: ref(false),
+      prompt: ref(false),
+      fileUploaded: ref(null),
+      publicationText: ref(""),
+      fab2: ref(false),
+
+      onClick() {
+        // console.log('Clicked on a fab action')
+      },
 
       comment(idPublication, description) {
         if (description) {
@@ -281,25 +414,29 @@ export default defineComponent({
       dateString = moment(dateString).utc().format("YYYY-MM-DD");
       return dateString;
     },
-    // createPublication() {
-    //   const formData = new FormData();
-    //   formData.append("file", this.imgFile);
-    //   formData.append("user", JSON.stringify(this.user));
-    //   formData.append("idTypePublication", 1);
-    //   formData.append("description", this.publicationText);
+    createPublication() {
+      const formData = new FormData();
+      formData.append("file", this.imgFile);
+      formData.append("user", JSON.stringify(this.user));
+      formData.append("idTypePublication", 1);
+      formData.append("description", this.publicationText);
 
-    //   this.$store.dispatch(CREATE_PUBLICATION, formData).then(() => {
-    //     this.$q.notify({
-    //       color: "green-4",
-    //       textColor: "white",
-    //       icon: "cloud_done",
-    //       message: "Publicación creada",
-    //     });
-    //     this.$store.dispatch(FETCH_PROFILE_PUBLICATIONS);
-    //     this.url = null;
-    //     this.publicationText = ref("");
-    //   });
-    // },
+      this.$store.dispatch(CREATE_PUBLICATION, formData).then(() => {
+        this.$q.notify({
+          color: "green-4",
+          textColor: "white",
+          icon: "cloud_done",
+          message: "Publicación creada",
+        });
+
+        const user = {
+          id: this.$route.params.id,
+        };
+        this.$store.dispatch(FETCH_PROFILE_PUBLICATIONS, user);
+        this.url = null;
+        this.publicationText = ref("");
+      });
+    },
 
     validateLike(idAccountsWhoLiked, idPublication) {
       for (let i in idAccountsWhoLiked) {
